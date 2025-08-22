@@ -57,11 +57,11 @@ public class Arm extends SubsystemBase {
         Dashboard.getAutoResettingButton("Go To Zero", buttonLoop)
                 .onTrue(Commands.runOnce(() -> {
                     desiredPositionCache = desiredPosition;
-                    desiredPosition = 0.0;
+                    Dashboard.putValue("Arm/desiredPosition", 0.0);
                 }));
         Dashboard.getAutoResettingButton("Go To Desired", buttonLoop)
                 .onTrue(Commands.runOnce(() -> {
-                    desiredPosition = desiredPositionCache;
+                    Dashboard.putValue("Arm/desiredPosition", desiredPositionCache);
                 }));
     }
 
@@ -83,7 +83,7 @@ public class Arm extends SubsystemBase {
         double dTerm = kD * (error - previousError) / 0.02;
         previousError = error;
         double output = pTerm + iTerm + dTerm;
-        motor.setVoltage(output);
+        motor.setVoltage(output > 1 ? 1 : (output < -1 ? -1 : output));
     }
 
     @Override

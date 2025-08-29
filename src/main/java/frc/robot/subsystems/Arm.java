@@ -5,15 +5,14 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import badgerlog.Dashboard;
 import badgerlog.entry.Entry;
 import badgerlog.entry.EntryType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.event.EventLoop;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 
 public class Arm extends SubsystemBase {
     private final TalonFX motor;
-    private boolean isEnabled = false;
 
     private double desiredPositionCache = 0.0;
 
@@ -40,12 +39,6 @@ public class Arm extends SubsystemBase {
 
     public Arm() {
         motor = new TalonFX(11);
-        RobotModeTriggers.disabled().onFalse(Commands.runOnce(() -> {
-            isEnabled = true;
-        })).onTrue(Commands.runOnce(() -> {
-            isEnabled = false;
-        }));
-
         EventLoop buttonLoop = CommandScheduler.getInstance().getActiveButtonLoop();
 
         Dashboard.getAutoResettingButton("Zero", buttonLoop)
@@ -88,7 +81,7 @@ public class Arm extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (!isEnabled) {
+        if (!DriverStation.isEnabled()) {
             return;
         }
         pid();
